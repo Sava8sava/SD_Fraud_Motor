@@ -1,0 +1,21 @@
+# --- Ambiente Virtual e Python ---
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# --- Dados Locais do Docker (Seus volumes persistentes) ---
+dados_kafka/
+dados-kafka/
+.docker/
+
+# --- Arquivos de Configuração do Ambiente/IDE ---
+*.swp
+*~
+
+# --- Scripts Temporários de Teste ---
+# O dump_topic.py foi usado só para debugar a fila do Kafka local
+dumb_topic.py
