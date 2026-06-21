@@ -134,7 +134,7 @@ def main(user_dict : dict):
 
             for transactions in transaction_buffer:
                 metadata = producer.send('transacoes_pendentes', value=transactions).get(timeout=5)
-                print(f"🔹 [Total Envios: {conter}] Tópico: {metadata.topic} | Partição: {metadata.partition} | Offset: {metadata.offset}")
+                print(f"🔹 [Total Envios: {cont}] Tópico: {metadata.topic} | Partição: {metadata.partition} | Offset: {metadata.offset}")
                 
                 if event_chance > 7:
                     time.sleep(0.1)
