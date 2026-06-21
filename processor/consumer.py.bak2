@@ -116,15 +116,21 @@ def processar_transacao(transacao):
 
 def main():
     print("Iniciando consumer...")
-
+    
     consumer = KafkaConsumer(
-        'transacoes_pendentes',
-        bootstrap_servers=['broker-kafka:29094'],
-        auto_offset_reset='earliest',
-        enable_auto_commit=False,
-        value_deserializer=lambda v: json.loads(v.decode('utf-8')),
-    )
-
+    'transacoes_pendentes',
+    bootstrap_servers=['broker-kafka:29094'],
+    group_id='motor-antifraude',
+    client_id='processor-1',
+    auto_offset_reset='earliest',
+    enable_auto_commit=False,
+    value_deserializer=lambda v: json.loads(v.decode('utf-8')),
+    session_timeout_ms=30000,
+    heartbeat_interval_ms=10000,
+    request_timeout_ms=40000,
+    max_poll_interval_ms=300000,
+)    
+     
     print("Assignment:", consumer.assignment())
 
     try:
@@ -137,13 +143,15 @@ def main():
             for tp, msgs in mensagens.items():
                 for msg in msgs:
                     transacao = msg.value
-                    transacao['offset'] = msg.offset
+
                     print("\nRecebido:", transacao)
 
                     resultado = processar_transacao(transacao)
 
                     print("Resultado:", resultado)
 
+                    # commit APÓS processar lote
+                consumer.commit()
 
     except KeyboardInterrupt:
         print("Encerrado")

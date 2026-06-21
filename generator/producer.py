@@ -48,7 +48,7 @@ DISTANCIAS_E_TEMPOS = {
 conter = 0 
 
 producer = KafkaProducer(
-    bootstrap_servers=['localhost:9092'],
+    bootstrap_servers=['broker-kafka:29094'],
     api_version=(3, 7, 0), 
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )

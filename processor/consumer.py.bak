@@ -137,13 +137,15 @@ def main():
             for tp, msgs in mensagens.items():
                 for msg in msgs:
                     transacao = msg.value
-                    transacao['offset'] = msg.offset
+
                     print("\nRecebido:", transacao)
 
                     resultado = processar_transacao(transacao)
 
                     print("Resultado:", resultado)
 
+                    # commit APÓS processar lote
+                consumer.commit()
 
     except KeyboardInterrupt:
         print("Encerrado")
