@@ -1,10 +1,10 @@
 import json
 from datetime import datetime
-from kafka import KafkaConsumer, TopicPartition
+#from kafka import KafkaConsumer, TopicPartition
+from confluent_kafka import Consumer,KafkaError 
 import statistics
 import uuid
 
-from kafka.consumer import group
 
 # Tabelas de referência para a validação geográfica
 CIDADES_COORDENADAS = {
@@ -117,33 +117,41 @@ def processar_transacao(transacao):
 def main():
     print("Iniciando consumer...")
 
-    consumer = KafkaConsumer(
-        'transacoes_pendentes',
-        bootstrap_servers=['broker-kafka:29094'],
-        auto_offset_reset='earliest',
-        enable_auto_commit=False,
-        value_deserializer=lambda v: json.loads(v.decode('utf-8')),
-    )
-
+    conf = {
+        'bootstrap.servers': 'broker-kafka:29094',
+        'group.id': 'motor-antifraude-confluent-v1',
+        'auto.offset.reset': 'earliest',
+        'enable.auto.commit': False,  # Commit manual
+        # Parâmetros de resiliência nativos da librdkafka
+        'session.timeout.ms': 45000,
+        'max.poll.interval.ms': 300000
+    }
+    consumer = Consumer(conf)
+    consumer.subscribe(['transacoes_pendentes'])
     print("Assignment:", consumer.assignment())
 
     try:
         while True:
-            mensagens = consumer.poll(timeout_ms=1000)
+            mensagens = consumer.poll(timeout=1.0)
 
             if not mensagens:
                 continue
+            if mensagens.error():
+                if mensagens.error().code() == KafkaError._PARTITION_EOF:
+                    continue 
+                else:
+                    print(f"ERRO_KAFKA:{mensagens.error()}")
+                    break
 
-            for tp, msgs in mensagens.items():
-                for msg in msgs:
-                    transacao = msg.value
-                    transacao['offset'] = msg.offset
-                    print("\nRecebido:", transacao)
+            transacao = json.loads(mensagens.value().decode('utf-8'))
+            transacao['offset'] = mensagens.offset()
 
-                    resultado = processar_transacao(transacao)
+            # Executa sua lógica matemática impecável
+            resultado = processar_transacao(transacao)
+            print("Resultado:", resultado)
 
-                    print("Resultado:", resultado)
-
+            # Commit manual idêntico ao que você queria fazer
+            consumer.commit(asynchronous=False)
 
     except KeyboardInterrupt:
         print("Encerrado")
