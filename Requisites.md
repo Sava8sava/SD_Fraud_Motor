@@ -10,7 +10,7 @@
 1. O Sistema deve conseguir lidar com um grande volume de transações em formato Json
 2. O sistema deve ser leve e modular 
 3. O sistema deve ser construindo em python e rodar em Docker 
-4. estruturado em Nós destribuidos(gerador, processador, e monitor) que se comunicam pela rede
+4. estruturado em Nós distribuidos(gerador, processador, e monitor) que se comunicam pela rede
 5. O gerador deve simular um gateway de pagamento que envia trasações para o processador **Pendentes** para o processador analisar
 6. O gerador deve rodar num loop infinito com um delay de 1 segundo que pode ser ajustavel
 7. configurar ma logica que gera operações suspeitas como multiplas compras num espaço muito curto de tempo ou compras geograficamente distantes num espaço impossivel de tempo 
@@ -35,6 +35,6 @@
 "timestamp" : string(iso 8601 ou epoch)
 
 ## Comentarios 
-- devido a condição de ser um cenario simulado para um trabalho acadêmico o estado temporario sera mantido em memoria volatil pela simpliciade do projeto
-- Por usar um sistema simples de identificação de fraude baseada em if/else, certas regras serão simplificadas 
+- devido a condição de ser um cenário simulado para um trabalho acadêmico, o estado temporário será mantido em memória volátil pela simpliciade do projeto
+- Por usar um sistema simples de identificação de fraude baseada em if/else, certas regras serão simplificadas
 
