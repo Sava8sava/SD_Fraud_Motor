@@ -2,7 +2,8 @@ import json
 import uuid
 import time 
 from datetime import datetime, timezone
-from kafka import KafkaProducer
+#from kafka import KafkaProducer
+from confluent_kafka import Producer
 import random 
 
 #estrutura 
@@ -47,11 +48,18 @@ DISTANCIAS_E_TEMPOS = {
 }
 conter = 0 
 
-producer = KafkaProducer(
-    bootstrap_servers=['broker-kafka:29094'],
-    api_version=(3, 7, 0), 
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
-)
+conf = {
+    'bootstrap.servers': 'broker-kafka:29094',
+    'client.id': 'app-gerador-producer',
+    'acks': 'all' }
+
+producer = Producer(conf)
+
+def delivery_report(err, msg):
+    if err is not None:
+        print(f"❌ Falha ao entregar mensagem: {err}")
+    else:
+        print(f"🔹 Tópico: {msg.topic()} | Partição: {msg.partition()} | Offset: {msg.offset()}")
 
 
 def generate_transaction(client, cidade_compra= None, value_range = [10.0,500.0]):
@@ -133,12 +141,20 @@ def main(user_dict : dict):
                 transaction_buffer = [normal_trasaction]
 
             for transactions in transaction_buffer:
-                metadata = producer.send('transacoes_pendentes', value=transactions).get(timeout=5)
-                print(f"🔹 [Total Envios: {cont}] Tópico: {metadata.topic} | Partição: {metadata.partition} | Offset: {metadata.offset}")
+                payload = json.dumps(transactions).encode('utf-8')
+                print(f"🔹 [Total Envios: {cont}] ", end="")
                 
+                producer.produce(
+                    'transacoes_pendentes', 
+                    value=payload, 
+                    callback=delivery_report
+                )
+                producer.poll(0)
+
                 if event_chance > 7:
                     time.sleep(0.1)
-
+            
+            producer.flush()
             time.sleep(2)
     except KeyboardInterrupt:
         print("Simulação Encerrada Manualmente!\n")
