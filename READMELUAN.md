@@ -1,6 +1,3 @@
-para Luan como subir certo
-Sim e não. Depende do que você quer fazer:
-
 **Para reiniciar do zero** (offset volta para o início):
 ```bash
 sudo docker compose down -v
