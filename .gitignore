@@ -19,3 +19,4 @@ dados-kafka/
 # --- Scripts Temporários de Teste ---
 # O dump_topic.py foi usado só para debugar a fila do Kafka local
 dumb_topic.py
+Desenvolvimento-de-um-Processador-Distribuido-de-Transacoes-em-Tempo-Real.pdf
